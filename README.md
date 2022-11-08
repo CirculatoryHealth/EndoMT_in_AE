@@ -17,6 +17,14 @@ LICENSE            | User permissions           | Read only
 .worcs             | WORCS metadata YAML        | Read only     
 prepare_data.R     | Script to process raw data | Human editable
 renv.lock          | Reproducible R environment | Read only     
+File               | Description                | Usage         
+------------------ | -------------------------- | --------------
+README.md          | Description of project     | Human editable
+EndoMT_in_AE.Rproj | Project file               | Loads project 
+LICENSE            | User permissions           | Read only     
+.worcs             | WORCS metadata YAML        | Read only     
+prepare_data.R     | Script to process raw data | Human editable
+renv.lock          | Reproducible R environment | Read only     
 
 <!--  You can consider adding the following to this file:                    -->
 <!--  * A citation reference for your project                                -->
