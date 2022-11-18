@@ -80,25 +80,4 @@ _gsdata_/
 # PolarMorphism/eur_w_ld_chr*
 # PolarMorphism/proxySearch_CAC_CAD*
 
-.Rhistory
-.Rprofile
-*.csv
-*.sav
-*.sas7bdat
-*.xlsx
-*.xls
-*.pdf
-*.fff
-*.log
-*.tex
-.Rhistory
-.Rprofile
-*.csv
-*.sav
-*.sas7bdat
-*.xlsx
-*.xls
-*.pdf
-*.fff
-*.log
-*.tex
+
