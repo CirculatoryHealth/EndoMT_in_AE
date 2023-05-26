@@ -1,0 +1,263 @@
+---
+title: "Baseline characteristics"
+author: "[Sander W. van der Laan, PhD](https://vanderlaan.science) | s.w.vanderlaan@gmail.com"
+date: "`r Sys.Date()`"
+output:
+  html_notebook:
+    cache: yes
+    code_folding: hide
+    collapse: yes
+    df_print: paged
+    fig.align: center
+    fig_caption: yes
+    fig_height: 6
+    fig_retina: 2
+    fig_width: 7
+    highlight: tango
+    theme: lumen
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+mainfont: Arial
+subtitle: Accompanying 'EndoMT_in_AE'
+editor_options:
+  chunk_output_type: inline
+# bibliography: references.bib
+# knit: worcs::cite_all
+---
+
+# General Setup
+We will clean the environment, setup the locations, define colors, and create a datestamp.
+
+_Clean the environment._
+```{r echo = FALSE}
+rm(list = ls())
+```
+
+_Set locations and working directories..._
+```{r LocalSystem, echo = FALSE}
+source("scripts/local.system.R")
+
+```
+
+_... a package-installation function ..._
+```{r Function: installations}
+source("scripts/functions.R")
+
+```
+
+
+_... and load those packages._
+```{r loading_packages, message=FALSE, warning=FALSE}
+source("scripts/pack01.packages.R")
+
+
+```
+
+_We will create a datestamp and define the Utrecht Science Park Colour Scheme_.
+```{r Setting: Colors}
+
+Today = format(as.Date(as.POSIXlt(Sys.time())), "%Y%m%d")
+Today.Report = format(as.Date(as.POSIXlt(Sys.time())), "%A, %B %d, %Y")
+
+source("scripts/colors.R")
+
+```
+
+```{r global_options, include = FALSE}
+# further define some knitr-options.
+knitr::opts_chunk$set(fig.width = 12, fig.height = 8, fig.path = 'Figures/', 
+                      wwarning = TRUE, # show warnings during codebook generation
+  message = TRUE, # show messages during codebook generation
+  error = TRUE, # do not interrupt codebook generation in case of errors,
+                # usually better for debugging
+  echo = TRUE,  # show R code
+                      eval = TRUE)
+ggplot2::theme_set(ggplot2::theme_minimal())
+pander::panderOptions("table.split.table", Inf)
+```
+
+# Introduction
+
+Here we load in the target list, MAGMA results from GWAS derived gene-based association studies, and lookup the target genes. 
+
+# Load targets
+
+```{r}
+library(openxlsx)
+endo_targets <- openxlsx::read.xlsx("clusters/20230525_Midstage_genes_10323_EndMTpaper.xlsx", sheet = "Targets")
+target_list <- unlist(endo_targets$GeneID)
+
+```
+
+# Load MAGMA results
+
+# CAD
+
+```{r}
+
+DATASETS <- list("CAC", "CHARGE_CAC_EA_AA", "cIMT", "Plaque", "CAD", "CES", "IS", "LAS", "AS", "SVD", "AF", "FrmrSmk", "EvrSmk", "CpD", "logOnset", "T2D", "T2DadjBMI", "BMI", "TC", "TG", "LDL", "HDL", "SBP", "DBP", "PP", "MDD", "SWB", "BIP", "Insomnia", "Neuroticism")
+
+# DATASETS <- list("CAC")
+
+magma.results <- data.frame(matrix(NA, ncol = 10, nrow = 0))
+
+magma.import <- function(tempDF, trait, target, verbose=c(TRUE,FALSE)){
+  cat("> collecting data...\n\n")
+    Symbol = tempDF$SYMBOL
+    EnsemblID = tempDF$GENE
+    Chr = tempDF$CHR
+    Start = tempDF$START
+    Stop = tempDF$STOP
+    Nsnps = tempDF$NSNPS
+    Nsamples = tempDF$N
+    Zstat = tempDF$ZSTAT
+    Pvalue = tempDF$P
+    
+    output = c(trait, EnsemblID, Symbol, Chr, Start, Stop, Nsnps, Nsamples, Zstat, Pvalue)
+    
+    if (verbose == TRUE) {
+      cat("We have collected the following and summarize it in an object:\n")
+      cat("Phenotype.....:", trait, "\n")
+      cat("Symbol........:", Symbol, "\n")
+      cat("EnsemblID.....:", EnsemblID, "\n")
+      cat("Chr...........:", Chr, "\n")
+      cat("Start.........:", Start, "\n")
+      cat("Stop..........:", Stop, "\n")
+      cat("Nsnps.........:", Nsnps, "\n")
+      cat("Nsamples......:", Nsamples, "\n")
+      cat("Zstat.........:", round(Zstat, 6), "\n")
+      cat("P.............:", signif(Pvalue, 8), "\n")
+    } else {
+      cat("Collecting data in summary object.\n")
+    }
+  return(output)
+  print(output)
+}
+
+
+for (target_of_interest in 1:length(target_list)) {
+  TARGET = target_list[target_of_interest]
+  for (TRAIT in DATASETS) {
+    cat(paste0("Getting data for ["), TARGET, "] in ",TRAIT,".\n")
+    currentDF <- fread(paste0(GWAS_loc, "/_magma/",TRAIT,"/",TRAIT,".magma.genes.out")) %>%
+      dplyr::filter(., SYMBOL==TARGET)
+    # for debug
+    # print(DT::datatable(currentDF))
+    print(nrow(currentDF))
+    # print(str(currentDF))
+    
+    magma.results.TEMP <- data.frame(matrix(NA, ncol = 10, nrow = 0))
+    magma.results.TEMP[1,] = magma.import(currentDF, TRAIT, TARGET, verbose = F)
+    magma.results = rbind(magma.results, magma.results.TEMP)
+  
+  }
+}
+
+cat("Edit the column names...\n")
+colnames(magma.results) = c("Phenotype", "EnsemblID", "Symbol",
+                            "Chr", "Start", "Stop",
+                            "Nsnps", "Nsamples",
+                            "Zstat", "Pvalue")
+cat("Correct the variable types...\n")
+magma.results$Phenotype <- as.character(magma.results$Phenotype)
+magma.results$EnsemblID <- as.character(magma.results$EnsemblID)
+magma.results$Symbol <- as.character(magma.results$Symbol)
+magma.results$Chr <- as.numeric(magma.results$Chr)
+magma.results$Start <- as.numeric(magma.results$Start)
+magma.results$Stop <- as.numeric(magma.results$Stop)
+magma.results$Nsnps <- as.numeric(magma.results$Nsnps)
+magma.results$Nsamples <- as.numeric(magma.results$Nsamples)
+magma.results$Zstat <- as.numeric(magma.results$Zstat)
+magma.results$Pvalue <- as.numeric(magma.results$Pvalue)
+
+
+
+# Removing intermediates
+cat("Removing intermediate files...\n")
+rm(currentDF, TRAIT, TARGET, magma.results.TEMP)
+
+```
+
+```{r}
+magma.results.filt <- magma.results %>% dplyr::filter(., !is.na(Pvalue))
+
+# Save the data
+cat("Writing results to Excel-file...\n")
+library(openxlsx)
+write.xlsx(magma.results.filt,
+           file = paste0(OUT_loc, "/",Today,".EndoMT.targets.GWASmagma.xlsx"),
+           rowNames = FALSE, colNames = TRUE, sheetName = "MAGMA_results")
+
+```
+
+# Visualize
+```{r}
+# install.packages.auto("CMplot")
+library("CMplot")
+data(pig60K)
+head(pig60K)
+
+setwd(paste0(PLOT_loc))
+for (TRAIT in DATASETS) {
+  temp <- subset(magma.results.filt, 
+                 Phenotype == TRAIT, 
+                 select = c("Symbol", "Chr", "Start", "Pvalue"))
+  highlight_list <- as.vector(subset(temp, Pvalue <= 1e-6, select = c("Symbol")))
+  # str(highlight_list)
+  CMplot(temp, plot.type = "m", col = c("grey30", "grey60"), LOG10 = TRUE, 
+         ylim = c(0,50),
+         threshold = c(1e-6, 0.05), threshold.lty = c(1,2), threshold.lwd = c(1,1), threshold.col = c("black","grey"), amplify=TRUE,
+         chr.den.col = NULL, 
+         highlight = highlight_list, highlight.text = highlight_list,
+         signal.col = c(uithof_color[3], uithof_color[16]), signal.cex = c(1.5,1.5), signal.pch = c(19,19),
+         main = TRAIT,
+         file = "pdf", file.name = paste0(Today,".",TRAIT), dpi = 300, file.output = TRUE, 
+         verbose = FALSE, 
+         width = 14, height = 6)
+}
+setwd(paste0(PROJECT_loc))
+rm(temp, highlight_list)
+```
+
+
+# Session information
+
+------------------------------------------------------------------------------------------------------------------------
+
+    Version:      v1.0.1
+    Last update:  2023-05-26
+    Written by:   Sander W. van der Laan (s.w.vanderlaan-2[at]umcutrecht.nl).
+    Description:  Script to get some Athero-Express Biobank Study baseline characteristics.
+    Minimum requirements: R version 3.4.3 (2017-06-30) -- 'Single Candle', Mac OS X El Capitan
+
+    **MoSCoW To-Do List**
+    The things we Must, Should, Could, and Would have given the time we have.
+    _M_
+
+    _S_
+
+    _C_
+
+    _W_
+
+    **Changes log**
+    * v1.0.1 Got MAGMA results. Added to Excel-file. Visualizations. 
+    * v1.0.0 Initial version. 
+
+------------------------------------------------------------------------------------------------------------------------
+
+```{r eval = TRUE}
+sessionInfo()
+```
+
+# Saving environment
+
+```{r Saving}
+save.image(paste0(PROJECT_loc, "/",Today,".",PROJECTNAME,".EndoMT_in_AE.RData"))
+```
+
++-----------------------------------------------------------------------------------------------------------------------------------------+
+| <sup>© 1979-2023 Sander W. van der Laan | s.w.vanderlaan[at]gmail.com | [vanderlaan.science](https://vanderlaan.science).</sup> |
++-----------------------------------------------------------------------------------------------------------------------------------------+

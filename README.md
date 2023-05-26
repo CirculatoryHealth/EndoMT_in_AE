@@ -3,6 +3,7 @@
 *Athero-Express Team*
 
 Lotte Slenders, 
+Marian Wesseling, 
 Sander W. van der Laan, 
 Michal Mokry, 
 Dominique de Kleijn,

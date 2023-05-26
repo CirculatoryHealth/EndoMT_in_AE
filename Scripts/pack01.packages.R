@@ -7,9 +7,10 @@ install.packages.auto("credentials")
 library("credentials")
 credentials::set_github_pat()
 
-install.packages.auto("R.utils")
-
 install.packages.auto("worcs")
+
+install.packages.auto("R.utils")
+install.packages.auto("pander")
 
 install.packages.auto("readr")
 install.packages.auto("optparse")
@@ -29,6 +30,7 @@ install.packages.auto("DT")
 install.packages.auto("eeptools")
 
 install.packages.auto("haven")
+install.packages.auto("openxlsx")
 install.packages.auto("tableone")
 
 install.packages.auto("BlandAltmanLeh")
@@ -46,5 +48,5 @@ install.packages.auto("ggpubr")
 install.packages.auto("UpSetR")
 
 devtools::install_github("thomasp85/patchwork")
-library("patchwork")
+
 install.packages.auto("sjPlot")

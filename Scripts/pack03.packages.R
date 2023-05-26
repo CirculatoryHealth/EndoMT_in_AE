@@ -30,10 +30,10 @@ install.packages.auto("tableone")
 # For a more efficient implementation of the Wilcoxon Rank Sum Test,
 # (default method for FindMarkers) please install the limma package
 # --------------------------------------------
-install.packages('BiocManager')
+install.packages.auto('BiocManager')
 BiocManager::install('limma')
 # --------------------------------------------
-# After installation of limma, Seurat will automatically use the more 
+#   After installation of limma, Seurat will automatically use the more 
 # efficient implementation (no further action necessary).
 # This message will be shown once per session
 
@@ -43,5 +43,3 @@ install.packages.auto('devtools')
 # devtools::install_version(package = 'Seurat', version = package_version('2.3.4'))
 install.packages.auto("Seurat")
 library("Seurat")
-
-

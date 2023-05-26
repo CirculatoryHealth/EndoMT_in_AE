@@ -5,12 +5,7 @@
 cat("\n* General packages...\n")
 install.packages.auto("credentials")
 library("credentials")
-# credentials::set_github_pat()
-
-install.packages.auto("R.utils")
-
-install.packages.auto('pander')
-install.packages.auto('openxlsx')
+credentials::set_github_pat()
 
 install.packages.auto("readr")
 install.packages.auto("optparse")
@@ -34,6 +29,7 @@ install.packages.auto("DT")
 install.packages.auto("qqman")
 install.packages.auto("forestplot")
 install.packages.auto("pheatmap")
+
 # for meta-analysis
 install.packages.auto("meta")
 install.packages.auto("bacon")
@@ -44,8 +40,23 @@ install.packages.auto("ggpubr")
 install.packages.auto("patchwork")
 install.packages.auto("corrr")
 
+# Installation of ggcorrplot()
+# --------------------------------
+if(!require(devtools))
+  install.packages.auto("devtools")
+devtools::install_github("kassambara/ggcorrplot")
+
+library(ggcorrplot)
+install.packages.auto("PerformanceAnalytics")
+install.packages.auto("GGally")
+library(GGally)
+
 install.packages.auto("haven")
 install.packages.auto("tableone")
+
+install.packages.auto("survival")
+install.packages.auto("survminer")
+install.packages.auto("Hmisc")
 
 # Install the devtools package from Hadley Wickham
 install.packages.auto('devtools')
@@ -60,29 +71,19 @@ install.packages.auto("mygene")
 install.packages.auto("TxDb.Hsapiens.UCSC.hg19.knownGene")
 install.packages.auto("org.Hs.eg.db")
 install.packages.auto("AnnotationDbi")
-
-# required for EnsDb.Hsapiens.v86
-# install.packages("minqa")
-
-# install.packages.auto("EnsDb.Hsapiens.v86")
-# if (!require("BiocManager", quietly = TRUE))
-#   install.packages("BiocManager")
-# 
-# BiocManager::install("EnsDb.Hsapiens.v86")
-library("EnsDb.Hsapiens.v86")
-
+install.packages.auto("EnsDb.Hsapiens.v86")
 install.packages.auto("EnhancedVolcano")
 
 # Install the annotation tables
 library("devtools")
-# devtools::install_github("stephenturner/annotables")
+devtools::install_github("stephenturner/annotables")
 library(dplyr)
 library(annotables)
 
 # alternative chart of a correlation matrix
 # --------------------------------
 # Alternative solution https://www.r-graph-gallery.com/199-correlation-matrix-with-ggally.html
-# install.packages.auto("GGally")
+install.packages.auto("GGally")
 
 # Quick display of two cabapilities of GGally, to assess the distribution and correlation of variables 
 library(GGally)
